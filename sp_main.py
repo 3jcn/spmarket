@@ -11,7 +11,7 @@ from datetime import datetime
 from PIL import Image
 plt.style.use('fivethirtyeight')
 
-# author: Thomas Nguyen; modified from github-Dataprofessor; March 6, 2021
+# author: Thomas Nguyen; modified from Dataprofessor & Computer Science; March 6, 2021
 
 st.markdown("""
 	<style>
