@@ -129,9 +129,7 @@ price_plot(df_selected_sector.Symbol[index[0]])
     #price_plot(df_selected_sector.Symbol[index[0]])
 
 ##############  ML #############
-from keras.models import Sequential
-from sklearn.preprocessing import MinMaxScaler
-from keras.layers import Dense, LSTM
+
 # get current date:
 today = date.today()
 now = datetime.now()
@@ -149,6 +147,9 @@ plt.xlabel('Time', fontweight='bold')
 plt.ylabel('Closing Price (USD)', fontweight='bold')
 st.pyplot(fig)
   
+from keras.models import Sequential
+from sklearn.preprocessing import MinMaxScaler
+from keras.layers import Dense, LSTM
 
 data = data.filter(['Close'])
 dataset = data.values
