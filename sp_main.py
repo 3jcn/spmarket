@@ -96,7 +96,7 @@ selected_sector = st.sidebar.selectbox('Choose a sector:', options = sorted_sect
 ## company_in_selected_sector = st.sidebar.selectbox('Choose a company:', options = df_selected_sector)
 
 df_selected_sector = df[ (df['GICS Sector']==selected_sector) ]
-st.subheader('List of all companies in your selected sector:')
+st.subheader('List of all companies in your selected sector:' + selected_sector)
 df_selected_sector
 
 # create a list of all companies in the selected sector:
