@@ -5,13 +5,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yfinance as yf
 import math
-from PIL import Image
 import pandas_datareader as web
 from datetime import date
 from datetime import datetime
-from keras.models import Sequential
-from sklearn.preprocessing import MinMaxScaler
-from keras.layers import Dense, LSTM
+from PIL import Image
 plt.style.use('fivethirtyeight')
 
 # author: Thomas Nguyen; modified from github-Dataprofessor; March 6, 2021
@@ -132,7 +129,9 @@ price_plot(df_selected_sector.Symbol[index[0]])
     #price_plot(df_selected_sector.Symbol[index[0]])
 
 ##############  ML #############
-
+from keras.models import Sequential
+from sklearn.preprocessing import MinMaxScaler
+from keras.layers import Dense, LSTM
 # get current date:
 today = date.today()
 now = datetime.now()
