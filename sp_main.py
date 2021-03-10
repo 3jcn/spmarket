@@ -4,6 +4,15 @@ import base64
 import matplotlib.pyplot as plt
 import numpy as np
 import yfinance as yf
+import math
+import pandas_datareader as web
+from datetime import date
+from datetime import datetime
+from keras.models import Sequential
+from sklearn.preprocessing import MinMaxScaler
+from keras.layers import Dense, LSTM
+plt.style.use('fivethirtyeight')
+
 # author: Thomas Nguyen; modified from github-Dataprofessor; March 6, 2021
 
 st.markdown("""
@@ -43,7 +52,7 @@ def price_plot(symbol):
   df['Date'] = df.index
   fig = plt.figure()
   plt.fill_between(df.Date, df.Close, color='skyblue', alpha=0.3)
-  plt.plot(df.Date, df.Close, color='skyblue', alpha=0.8)
+  plt.plot(df.Date, df.Close, color='blue', alpha=0.8)
   plt.xticks(rotation=90)
   plt.title(symbol, fontweight='bold')
   plt.xlabel('Date', fontweight='bold')
@@ -63,13 +72,14 @@ st.write('@author: [Thomas Nguyen](https://www.new3jcn.com)')
 #st.title('S&P 500 App')
 
 st.markdown("""
-    This app shows **the stock closing price** of any company in **S&P 500** (year-to-date)!
-    * **Data source:** [Wikipedia](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies).
-    * **Content of data:** 
+    This app shows **the stock closing price** of a company in **S&P 500** year-to-date 2021 and from 1/1/2012 to today!
+    This app also predicts the stock closing price for the company for the next stock market open day.
+    * **Data source for 2021:** [Wikipedia](https://en.wikipedia.org/wiki/List_of_S%26P_500_companies).
+    * **Data source for 2012-2020:** [Yahoo](https://finance.yahoo.com/quote/ATVI/history?p=ATVI) 
     """)
 
 # show data:
-df
+# df
 
 
 # Sidebar - Sector selection:
@@ -109,9 +119,92 @@ data = yf.download(
 # Get the selected company's name:
 comp_name = df[df['Symbol']==company_name]
 name = comp_name['Security'].to_string()
-st.subheader("Display the stock closing price of '" + name[3:] + "':")
+st.subheader("Display the stock closing price of '" + name[3:] + "' in year of 2021:")
+
 index = df.index[df['Symbol']==company_name]
 price_plot(df_selected_sector.Symbol[index[0]])
 
 #if st.button('Show Graph:'):
     #price_plot(df_selected_sector.Symbol[index[0]])
+
+##############  ML #############
+# get current date:
+today = date.today()
+now = datetime.now()
+data = web.DataReader(company_name,data_source='yahoo',start='2012-01-01', end=today)
+st.subheader("Display the stock closing price of '" + name[3:] + "' from 01/01/2012 to " + now.strftime("%m/%d/%Y"))
+
+
+dt = pd.DataFrame(data['Close'])
+dt['Date'] = dt.index
+fig = plt.figure()
+plt.fill_between(dt.Date, dt.Close, color='skyblue', alpha=0.3)
+plt.plot(dt.Date, dt.Close, color='blue', alpha=0.8)
+plt.xticks(rotation=90)
+plt.title(company_name, fontweight='bold')
+plt.xlabel('Date', fontweight='bold')
+plt.ylabel('Closing Price (USD)', fontweight='bold')
+st.pyplot(fig)
+  
+
+data = data.filter(['Close'])
+dataset = data.values
+training_data_len = math.ceil(len(dataset)*0.8)
+scaler = MinMaxScaler(feature_range=(0,1))
+scaled_data = scaler.fit_transform(dataset)
+train_data = scaled_data[0:training_data_len,:] 
+#st.write(train_data) = 1812
+x_train = []
+y_train = []
+
+for i in range(60, len(train_data)):
+    x_train.append(train_data[i-60:i, 0])
+    y_train.append(train_data[i,0])
+
+x_train,y_train = np.array(x_train),np.array(y_train)
+# three dimensions: x_train.shape[0]=rows x_train.shape[1]=columns
+x_train = np.reshape(x_train, (x_train.shape[0],x_train.shape[1],1))
+model = Sequential()
+model.add(LSTM(50, return_sequences=True, input_shape=(x_train.shape[1],1)))
+model.add(LSTM(50, return_sequences=False))
+model.add(Dense(25))
+model.add(Dense(1))
+
+model.compile(optimizer='adam', loss='mean_squared_error')
+model.fit(x_train,y_train,batch_size=1, epochs=1)
+
+#create testing data:
+test_data = scaled_data[training_data_len-60:, :]
+x_test = []
+y_test = dataset[training_data_len:, :]
+for i in range(60, len(test_data)):
+    x_test.append(test_data[i-60:i, 0])
+
+x_test = np.array(x_test)
+# create 3 dim for the model LSTM
+x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], 1))
+
+predictions = model.predict(x_test)
+predictions = scaler.inverse_transform(predictions)
+rmse = np.sqrt(np.mean(predictions - y_test)**2 )
+st.subheader("Root Mean Squared Error of this model:")
+st.write(rmse)
+
+
+#Get the quote:
+apple_quote = web.DataReader(company_name, data_source='yahoo',start='2012-01-01',end=today)
+#create a new dataframe
+new_df=apple_quote.filter(['Close'])
+#get last 60 days closing price and convert data to array
+last_60_days = new_df[-60:].values
+last_60_days_scaled = scaler.transform(last_60_days)
+X_test = []
+X_test.append(last_60_days_scaled)
+X_test = np.array(X_test)
+X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1], 1))
+pred_price = model.predict(X_test)
+# undo scaling
+pred_price = scaler.inverse_transform(pred_price)
+
+st.subheader("Prediting the stock closing price of the company for the next stock market open day:")
+st.write(pred_price)
