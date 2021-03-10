@@ -143,10 +143,11 @@ plt.fill_between(dt.Date, dt.Close, color='skyblue', alpha=0.3)
 plt.plot(dt.Date, dt.Close, color='blue', alpha=0.8)
 plt.xticks(rotation=90)
 plt.title(company_name, fontweight='bold')
-plt.xlabel('Time', fontweight='bold')
+#plt.xlabel('Time', fontweight='bold')
 plt.ylabel('Closing Price (USD)', fontweight='bold')
 st.pyplot(fig)
-  
+
+st.subheader("Machine Learning Model Prediction:")  
 from keras.models import Sequential
 from sklearn.preprocessing import MinMaxScaler
 from keras.layers import Dense, LSTM
