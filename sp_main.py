@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import yfinance as yf
 import math
+from PIL import Image
 import pandas_datareader as web
 from datetime import date
 from datetime import datetime
@@ -62,12 +63,15 @@ def price_plot(symbol):
 df = load_data()
 sector = df.groupby('GICS Sector')
 
-html_temp = """
-	<div style="background-color:brown; padding:1px">
-	<h1 style="color:white; text-align:center;">S&P 500 App</h1>
-	</div>
-	"""
-st.markdown(html_temp,unsafe_allow_html=True)
+image = Image.open('banner.png')
+st.image(image,use_column_width=True)
+
+#html_temp = """
+#	<div style="background-color:brown; padding:1px">
+#	<h1 style="color:white; text-align:center;">S&P 500 App</h1>
+#	</div>
+#	"""
+#st.markdown(html_temp,unsafe_allow_html=True)
 st.write('@author: [Thomas Nguyen](https://www.new3jcn.com)')
 #st.title('S&P 500 App')
 
@@ -119,7 +123,7 @@ data = yf.download(
 # Get the selected company's name:
 comp_name = df[df['Symbol']==company_name]
 name = comp_name['Security'].to_string()
-st.subheader("Display the stock closing price of '" + name[3:] + "' in year of 2021:")
+st.subheader("Display the stock closing price of '" + name[3:] + "' year-to-date 2021:")
 
 index = df.index[df['Symbol']==company_name]
 price_plot(df_selected_sector.Symbol[index[0]])
@@ -128,12 +132,12 @@ price_plot(df_selected_sector.Symbol[index[0]])
     #price_plot(df_selected_sector.Symbol[index[0]])
 
 ##############  ML #############
+
 # get current date:
 today = date.today()
 now = datetime.now()
 data = web.DataReader(company_name,data_source='yahoo',start='2012-01-01', end=today)
 st.subheader("Display the stock closing price of '" + name[3:] + "' from 01/01/2012 to " + now.strftime("%m/%d/%Y"))
-
 
 dt = pd.DataFrame(data['Close'])
 dt['Date'] = dt.index
@@ -142,7 +146,7 @@ plt.fill_between(dt.Date, dt.Close, color='skyblue', alpha=0.3)
 plt.plot(dt.Date, dt.Close, color='blue', alpha=0.8)
 plt.xticks(rotation=90)
 plt.title(company_name, fontweight='bold')
-plt.xlabel('Date', fontweight='bold')
+plt.xlabel('Time', fontweight='bold')
 plt.ylabel('Closing Price (USD)', fontweight='bold')
 st.pyplot(fig)
   
@@ -162,7 +166,7 @@ for i in range(60, len(train_data)):
     y_train.append(train_data[i,0])
 
 x_train,y_train = np.array(x_train),np.array(y_train)
-# three dimensions: x_train.shape[0]=rows x_train.shape[1]=columns
+# create three dimensions data: x_train.shape[0]=rows x_train.shape[1]=columns
 x_train = np.reshape(x_train, (x_train.shape[0],x_train.shape[1],1))
 model = Sequential()
 model.add(LSTM(50, return_sequences=True, input_shape=(x_train.shape[1],1)))
