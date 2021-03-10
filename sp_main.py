@@ -96,7 +96,7 @@ selected_sector = st.sidebar.selectbox('Choose a sector:', options = sorted_sect
 ## company_in_selected_sector = st.sidebar.selectbox('Choose a company:', options = df_selected_sector)
 
 df_selected_sector = df[ (df['GICS Sector']==selected_sector) ]
-st.subheader('List of all companies in your selected sector:' + selected_sector)
+st.subheader('List of all companies in your selected sector:  ' + selected_sector)
 df_selected_sector
 
 # create a list of all companies in the selected sector:
@@ -120,7 +120,7 @@ data = yf.download(
 # Get the selected company's name:
 comp_name = df[df['Symbol']==company_name]
 name = comp_name['Security'].to_string()
-st.subheader("Display the stock closing price of '" + name[3:] + "' year-to-date 2021:")
+st.subheader("Display the stock closing price of ' " + name[3:] + "' year-to-date 2021:")
 
 index = df.index[df['Symbol']==company_name]
 price_plot(df_selected_sector.Symbol[index[0]])
