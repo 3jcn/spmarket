@@ -147,10 +147,11 @@ plt.title(company_name, fontweight='bold')
 plt.ylabel('Closing Price (USD)', fontweight='bold')
 st.pyplot(fig)
 
-st.subheader("Machine Learning Model Prediction:")  
+st.subheader("Machine Learning Model Prediction:")
+
+from keras.layers import Dense, LSTM
 from keras.models import Sequential
 from sklearn.preprocessing import MinMaxScaler
-from keras.layers import Dense, LSTM
 
 data = data.filter(['Close'])
 dataset = data.values
