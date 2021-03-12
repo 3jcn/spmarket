@@ -153,6 +153,7 @@ from tensorflow.python.keras.models import Sequential
 #from keras.layers import Dense, LSTM
 #from keras.models import Sequential
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.metrics import r2_score
 
 data = data.filter(['Close'])
 dataset = data.values
@@ -196,6 +197,9 @@ predictions = scaler.inverse_transform(predictions)
 rmse = np.sqrt(np.mean(predictions - y_test)**2 )
 st.subheader("Root Mean Squared Error of this model:")
 st.write(rmse)
+score=r2_score(y_test,predictions)
+st.subheader("R2 Score of this model:")
+st.write(score)
 
 
 #Get the quote:
