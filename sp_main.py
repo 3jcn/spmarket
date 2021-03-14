@@ -217,5 +217,5 @@ pred_price = model.predict(X_test)
 # undo scaling
 pred_price = scaler.inverse_transform(pred_price)
 
-st.subheader("Prediting the stock closing price of the company for the next stock market open day:")
+st.subheader("Predicting the stock closing price of the company for the next stock market open day:")
 st.write(pred_price)
