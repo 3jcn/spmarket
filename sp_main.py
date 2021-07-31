@@ -152,13 +152,14 @@ from tensorflow.python.keras.layers import LSTM, Dense
 from tensorflow.python.keras.models import Sequential
 #from keras.layers import Dense, LSTM
 #from keras.models import Sequential
-from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler #MinMaxScaler
 from sklearn.metrics import r2_score
 
 data = data.filter(['Close'])
 dataset = data.values
 training_data_len = math.ceil(len(dataset)*0.8)
-scaler = MinMaxScaler(feature_range=(0,1))
+scaler = StandardScaler()
+#scaler = MinMaxScaler(feature_range=(0,1))
 scaled_data = scaler.fit_transform(dataset)
 train_data = scaled_data[0:training_data_len,:] 
 #st.write(train_data) = 1812
